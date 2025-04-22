@@ -11,7 +11,8 @@ class Employe extends Model
     use HasFactory, HasApiTokens;
 
     protected $fillable = [
-        'user_id',
+        'name',
+        'prenom',
         'biometric_id',
         'salaire',
         'departement_id',
@@ -22,9 +23,11 @@ class Employe extends Model
 
     protected $hidden = [
         'password',
+        'remember_token',
     ];
 
     protected $casts = [
+        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 

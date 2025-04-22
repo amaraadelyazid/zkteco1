@@ -11,12 +11,20 @@ class Admin extends Model
     use HasFactory, HasApiTokens;
 
     protected $fillable = [
-        'user_id',
         'biometric_id',
     ];
 
-    public function user()
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+    public function logs()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(Log::class);
     }
 }

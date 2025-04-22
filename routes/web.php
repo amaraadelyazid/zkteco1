@@ -144,3 +144,41 @@ Route::get('/migrations-info/sample-data', function () {
 
     return view('sample-data', compact('tables'));
 });
+
+
+use MehediJaman\LaravelZkteco\LaravelZkteco;
+
+Route::get('/test-zkteco', function () {
+    try {
+        // Check if the socket extension is loaded
+        if (!function_exists('socket_create')) {
+            throw new \Exception("The PHP socket extension is not enabled. Please enable 'sockets' in php.ini.");
+        }
+
+        $zk = new LaravelZkteco('127.0.0.1', 4370);  // Localhost just for testing
+
+        // Optional: Mocking connect and getTime if testing without device
+        // Override or extend LaravelZkteco to mock if needed
+        if (app()->environment('local')) {
+            // Simulate behavior instead of real socket calls
+            return response()->json([
+                'time' => now()->toDateTimeString(),
+                'note' => 'Simulated response. No real device connected.'
+            ]);
+        }
+
+        $zk->connect();
+        $deviceTime = $zk->getTime();
+
+        // Basic validation on $deviceTime to avoid unpack error
+        if (empty($deviceTime)) {
+            throw new \Exception("No data received from device. Make sure it is connected and reachable.");
+        }
+
+        return response()->json(['time' => $deviceTime]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()]);
+    }
+});
+
+

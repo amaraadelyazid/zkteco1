@@ -1,7 +1,5 @@
 <?php
-
 namespace Database\Seeders;
-
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -9,18 +7,10 @@ use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Disable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
-        // Clear existing data
         $this->truncateTables();
-
-        // Seed data
         $this->seedUsers();
         $this->seedDepartements();
         $this->seedShifts();
@@ -33,8 +23,6 @@ class DatabaseSeeder extends Seeder
         $this->seedLeaveRequests();
         $this->seedComplaints();
         $this->seedLogs();
-
-        // Re-enable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
@@ -42,22 +30,19 @@ class DatabaseSeeder extends Seeder
     {
         $tables = [
             'users',
-            'departements',
-            'shifts',
-            'dispositif_biometriques',
             'admins',
             'grhs',
             'employes',
+            'departements',
+            'shifts',
+            'dispositif_biometriques',
             'fiche_de_paies',
             'presences',
             'demande_conges',
             'reclamations',
             'logs',
             'personal_access_tokens',
-            'password_reset_tokens',
-            'sessions',
         ];
-
         foreach ($tables as $table) {
             DB::table($table)->truncate();
         }
@@ -67,35 +52,15 @@ class DatabaseSeeder extends Seeder
     {
         $users = [
             [
-                'name' => 'Admin',
-                'email' => 'admin@gmail.com',
+                'name' => 'Generic User',
+                'email' => 'user@gmail.com',
                 'password' => Hash::make('password'),
-                'role' => 'admin',
                 'email_verified_at' => now(),
-            ],
-            [
-                'name' => 'GRH',
-                'email' => 'grh@gmail.com',
-                'password' => Hash::make('password'),
-                'role' => 'grh',
-                'email_verified_at' => now(),
-            ],
-            [
-                'name' => 'adel',
-                'email' => 'adel@gmail.com',
-                'password' => Hash::make('adel1234'),
-                'role' => 'employe',
-                'email_verified_at' => now(),
-            ],
-            [
-                'name' => 'adem',
-                'email' => 'adem@gmail.com',
-                'password' => Hash::make('adem1234'),
-                'role' => 'employe',
-                'email_verified_at' => now(),
+                'remember_token' => Str::random(10),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ];
-
         DB::table('users')->insert($users);
     }
 
@@ -107,7 +72,6 @@ class DatabaseSeeder extends Seeder
             ['nom' => 'Comptabilité', 'description' => 'Département financier'],
             ['nom' => 'Production', 'description' => 'Département de production'],
         ];
-
         DB::table('departements')->insert($departements);
     }
 
@@ -145,7 +109,6 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Shift de nuit flexible',
             ],
         ];
-
         DB::table('shifts')->insert($shifts);
     }
 
@@ -165,37 +128,49 @@ class DatabaseSeeder extends Seeder
                 'status' => 'active',
             ],
         ];
-
         DB::table('dispositif_biometriques')->insert($devices);
     }
 
     protected function seedAdmins(): void
     {
-        $admin = DB::table('users')->where('email', 'admin@gmail.com')->first();
-
-        DB::table('admins')->insert([
-            'user_id' => $admin->id,
-            'biometric_id' => 1001,
-        ]);
+        $admins = [
+            [
+                'name' => 'Admin',
+                'email' => 'admin@gmail.com',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'remember_token' => Str::random(10),
+                'biometric_id' => 1001,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ];
+        DB::table('admins')->insert($admins);
     }
 
     protected function seedGRHs(): void
     {
-        $grh = DB::table('users')->where('email', 'grh@gmail.com')->first();
         $shift = DB::table('shifts')->first();
-
-        DB::table('grhs')->insert([
-            'user_id' => $grh->id,
-            'biometric_id' => 2001,
-            'salaire' => 5000.00,
-            'shift_id' => $shift->id,
-        ]);
+        $grhs = [
+            [
+                'nom' => 'GRH',
+                'prenom' => 'Manager',
+                'email' => 'grh@gmail.com',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+                'remember_token' => Str::random(10),
+                'biometric_id' => 2001,
+                'salaire' => 5000.00,
+                'shift_id' => $shift->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ];
+        DB::table('grhs')->insert($grhs);
     }
 
     protected function seedEmployes(): void
     {
-        $adel = DB::table('users')->where('email', 'adel@gmail.com')->first();
-        $adem = DB::table('users')->where('email', 'adem@gmail.com')->first();
         $departementIT = DB::table('departements')->where('nom', 'Informatique')->first();
         $departementRH = DB::table('departements')->where('nom', 'Ressources Humaines')->first();
         $shiftMatin = DB::table('shifts')->where('nom', 'Shift Matin')->first();
@@ -203,29 +178,36 @@ class DatabaseSeeder extends Seeder
 
         $employes = [
             [
-                'user_id' => $adel->id,
+                'nom' => 'Adel',
+                'prenom' => 'Adel',
+                'email' => 'adel@gmail.com',
+                'password' => Hash::make('adel1234'),
+                'email_verified_at' => now(),
+                'remember_token' => Str::random(10),
                 'biometric_id' => 3001,
-                'nom' => 'adel',
-                'prenom' => 'adel',
                 'salaire' => 3000.00,
+                'poste' => 'Développeur',
                 'departement_id' => $departementIT->id,
                 'shift_id' => $shiftMatin->id,
-                'email' => 'adel@gmail.com',
-                'password' => Hash::make('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'user_id' => $adem->id,
+                'nom' => 'Adem',
+                'prenom' => 'Adem',
+                'email' => 'adem@gmail.com',
+                'password' => Hash::make('adem1234'),
+                'email_verified_at' => now(),
+                'remember_token' => Str::random(10),
                 'biometric_id' => 3002,
-                'nom' => 'adem',
-                'prenom' => 'adem',
                 'salaire' => 3500.00,
+                'poste' => 'Recruteur',
                 'departement_id' => $departementRH->id,
                 'shift_id' => $shiftNuit->id,
-                'email' => 'adem@gmail.com',
-                'password' => Hash::make('password'),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ];
-
         DB::table('employes')->insert($employes);
     }
 
@@ -233,7 +215,6 @@ class DatabaseSeeder extends Seeder
     {
         $adel = DB::table('employes')->where('email', 'adel@gmail.com')->first();
         $adem = DB::table('employes')->where('email', 'adem@gmail.com')->first();
-
         $currentMonth = now()->format('F Y');
 
         $paySlips = [
@@ -246,6 +227,8 @@ class DatabaseSeeder extends Seeder
                 'primes' => 100.00,
                 'status' => 'paid',
                 'date_generation' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'employe_id' => $adem->id,
@@ -256,11 +239,13 @@ class DatabaseSeeder extends Seeder
                 'primes' => 150.00,
                 'status' => 'pending',
                 'date_generation' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ];
-
         DB::table('fiche_de_paies')->insert($paySlips);
     }
+
     protected function seedPresences(): void
     {
         $employes = DB::table('employes')->get();
@@ -272,7 +257,6 @@ class DatabaseSeeder extends Seeder
             $startTime = now()->setTimeFromTimeString($shift->heure_debut)->subMinutes(5);
             $endTime = now()->setTimeFromTimeString($shift->heure_fin)->addMinutes(5);
 
-            // Entry record
             DB::table('presences')->insert([
                 'employe_id' => $employe->id,
                 'timestamp' => $startTime,
@@ -280,111 +264,120 @@ class DatabaseSeeder extends Seeder
                 'methode' => 'biométrique',
                 'is_anomalie' => false,
                 'etat' => 'present',
-                'jour' => $today,
-                'dispositif_id' => $devices->random()->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+'jour' => $today,
+'dispositif_id' => $devices->random()->id,
+'created_at' => now(),
+'updated_at' => now(),
+]);
 
-            // Exit record
-            DB::table('presences')->insert([
-                'employe_id' => $employe->id,
-                'timestamp' => $endTime,
-                'type' => 'sortie',
-                'methode' => 'biométrique',
-                'is_anomalie' => false,
-                'etat' => 'present',
-                'jour' => $today,
-                'dispositif_id' => $devices->random()->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+DB::table('presences')->insert([
+'employe_id' => $employe->id,
+'timestamp' => $endTime,
+'type' => 'sortie',
+'methode' => 'biométrique',
+'is_anomalie' => false,
+'etat' => 'present',
+'jour' => $today,
+'dispositif_id' => $devices->random()->id,
+'created_at' => now(),
+'updated_at' => now(),
+]);
 
-            // Create some anomalies (late arrivals or early departures)
-            if (rand(0, 1)) {
-                DB::table('presences')->insert([
-                    'employe_id' => $employe->id,
-                    'timestamp' => $startTime->addMinutes(rand(20, 60)),
-                    'type' => 'entrée',
-                    'methode' => 'manuel',
-                    'is_anomalie' => true,
-                    'etat' => 'retard',
-                    'jour' => $today,
-                    'dispositif_id' => null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-        }
-    }
+if (rand(0, 1)) {
+DB::table('presences')->insert([
+'employe_id' => $employe->id,
+'timestamp' => $startTime->addMinutes(rand(20, 60)),
+'type' => 'entrée',
+'methode' => 'manuel',
+'is_anomalie' => true,
+'etat' => 'retard',
+'jour' => $today,
+'dispositif_id' => null,
+'created_at' => now(),
+'updated_at' => now(),
+]);
+}
+}
+}
 
-    protected function seedLeaveRequests(): void
-    {
-        $employes = DB::table('employes')->get();
-        $grhs = DB::table('grhs')->get();
+protected function seedLeaveRequests(): void
+{
+$employes = DB::table('employes')->get();
+$grhs = DB::table('grhs')->get();
 
-        foreach ($employes as $employe) {
-            $status = ['en_attente', 'approuvee', 'refusee'][rand(0, 2)];
+foreach ($employes as $employe) {
+$status = ['en_attente', 'approuvee', 'refusee'][rand(0, 2)];
 
-            $leaveRequest = [
-                'employe_id' => $employe->id,
-                'type' => ['annuel', 'maladie', 'maternité', 'exceptionnel'][rand(0, 3)],
-                'message' => 'Je souhaite prendre des congés pour raison personnelle.',
-                'photo' => null,
-                'status' => $status,
-                'reponse' => $status !== 'en_attente' ? 'Votre demande a été ' . $status : null,
-                'grh_id' => $status !== 'en_attente' ? $grhs->random()->id : null,
-                'date_demande' => now()->subDays(rand(1, 30)),
-                'date_debut' => now()->addDays(rand(5, 10))->format('Y-m-d'),
-                'date_fin' => now()->addDays(rand(11, 20))->format('Y-m-d'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+$leaveRequest = [
+'employe_id' => $employe->id,
+'type' => ['annuel', 'maladie', 'maternité', 'exceptionnel'][rand(0, 3)],
+'message' => 'Je souhaite prendre des congés pour raison personnelle.',
+'photo' => null,
+'status' => $status,
+'reponse' => $status !== 'en_attente' ? 'Votre demande a été ' . $status : null,
+'grh_id' => $status !== 'en_attente' ? $grhs->random()->id : null,
+'date_demande' => now()->subDays(rand(1, 30)),
+'date_debut' => now()->addDays(rand(5, 10))->format('Y-m-d'),
+'date_fin' => now()->addDays(rand(11, 20))->format('Y-m-d'),
+'created_at' => now(),
+'updated_at' => now(),
+];
 
-            DB::table('demande_conges')->insert($leaveRequest);
-        }
-    }
+DB::table('demande_conges')->insert($leaveRequest);
+}
+}
 
-    protected function seedComplaints(): void
-    {
-        $employes = DB::table('employes')->get();
-        $grhs = DB::table('grhs')->get();
+protected function seedComplaints(): void
+{
+$employes = DB::table('employes')->get();
+$grhs = DB::table('grhs')->get();
 
-        foreach ($employes as $employe) {
-            $status = ['nouveau', 'en_cours', 'resolu'][rand(0, 2)];
+foreach ($employes as $employe) {
+$status = ['nouveau', 'en_cours', 'resolu'][rand(0, 2)];
 
-            $complaint = [
-                'employe_id' => $employe->id,
-                'message' => 'J\'ai un problème avec ' . ['mon salaire', 'mes horaires', 'mon manager', 'mes congés'][rand(0, 3)] . '.',
-                'statut' => $status,
-                'reponse' => $status === 'resolu' ? 'Votre réclamation a été traitée.' : null,
-                'grh_id' => $status !== 'nouveau' ? $grhs->random()->id : null,
-                'date_reclamation' => now()->subDays(rand(1, 30)),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+$complaint = [
+'employe_id' => $employe->id,
+'message' => 'J ai un problème avec ' . ['mon salaire', 'mes horaires', 'mon manager', 'mes congés'][rand(0, 3)] . '.',
+'statut' => $status,
+'reponse' => $status === 'resolu' ? 'Votre réclamation a été traitée.' : null,
+'grh_id' => $status !== 'nouveau' ? $grhs->random()->id : null,
+'date_reclamation' => now()->subDays(rand(1, 30)),
+'created_at' => now(),
+'updated_at' => now(),
+];
 
-            DB::table('reclamations')->insert($complaint);
-        }
-    }
+DB::table('reclamations')->insert($complaint);
+}
+}
 
-    protected function seedLogs(): void
-    {
-        $users = DB::table('users')->get();
-        $actions = [
-            'login', 'logout', 'create', 'update', 'delete',
-            'demande_conge', 'presence', 'paiement', 'reclamation'
-        ];
+protected function seedLogs(): void
+{
+$admins = DB::table('admins')->get();
+$grhs = DB::table('grhs')->get();
+$employes = DB::table('employes')->get();
+$users = DB::table('users')->get();
+$actions = [
+'login', 'logout', 'create', 'update', 'delete',
+'demande_conge', 'presence', 'paiement', 'reclamation'
+];
 
-        for ($i = 0; $i < 50; $i++) {
-            DB::table('logs')->insert([
-                'user_id' => rand(0, 1) ? $users->random()->id : null,
-                'level' => ['info', 'warning', 'error'][rand(0, 2)],
-                'action' => $actions[rand(0, count($actions) - 1)],
-                'message' => 'User performed ' . $actions[rand(0, count($actions) - 1)] . ' action',
-                'created_at' => now()->subDays(rand(0, 30)),
-                'updated_at' => now()->subDays(rand(0, 30)),
-            ]);
-        }
-    }
+$allUsers = $admins->merge($grhs)->merge($employes)->merge($users);
+
+for ($i = 0; $i < 50; $i++) {
+$user = rand(0, 1) ? $allUsers->random() : null;
+$table = $user ? ($admins->contains($user) ? 'admins' : ($grhs->contains($user) ? 'grhs' : ($employes->contains($user) ? 'employes' : 'users'))) : null;
+
+DB::table('logs')->insert([
+'user_id' => $user && $table === 'users' ? $user->id : null,
+'admin_id' => $user && $table === 'admins' ? $user->id : null,
+'grh_id' => $user && $table === 'grhs' ? $user->id : null,
+'employe_id' => $user && $table === 'employes' ? $user->id : null,
+'level' => ['info', 'warning', 'error'][rand(0, 2)],
+'action' => $actions[rand(0, count($actions) - 1)],
+'message' => 'User performed ' . $actions[rand(0, count($actions) - 1)] . ' action',
+'created_at' => now()->subDays(rand(0, 30)),
+'updated_at' => now()->subDays(rand(0, 30)),
+]);
+}
+}
 }

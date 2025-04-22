@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('admin_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('grh_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('employe_id')->nullable()->constrained()->nullOnDelete();
             $table->string('level');
             $table->string('action');
             $table->text('message');

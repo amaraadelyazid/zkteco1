@@ -10,13 +10,21 @@ class grh extends Model
 {
     use HasFactory, HasApiTokens;
 
-    protected $table = 'grhs';
-
     protected $fillable = [
-        'user_id',
+        'name',
+        'email',
+        'password',
         'biometric_id',
         'salaire',
         'shift_id',
+    ];
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
 
     public function user()

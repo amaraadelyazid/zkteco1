@@ -45,6 +45,18 @@ return [
             'provider' => 'users',
             'hash' => true,
         ],
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
+        'grh' => [
+            'driver' => 'session',
+            'provider' => 'grhs',
+        ],
+        'employe' => [
+            'driver' => 'session',
+            'provider' => 'employes',
+        ],
     ],
 
     /*
@@ -68,6 +80,18 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\Admin::class),
+        ],
+        'grhs' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\grh::class),
+        ],
+        'employes' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\Employe::class),
         ],
 
         // 'users' => [

@@ -13,16 +13,30 @@ return new class extends Migration
     {
         Schema::create('employes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('biometric_id')->unique();
             $table->string('nom');
             $table->string('prenom');
+            $table->string('email')->unique()->nullable();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password')->nullable();
+            $table->rememberToken();
+            $table->integer('biometric_id')->unique();
             $table->float('salaire');
+            $table->string('poste');
             $table->foreignId('departement_id')->constrained()->onDelete('restrict')->nullable();
             $table->foreignId('shift_id')->constrained()->onDelete('restrict');
-            $table->string('email')->nullable();
-            $table->string('password')->nullable();
             $table->timestamps();
+        });
+
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->foreignId('admin_id')->nullable()->index();
+            $table->foreignId('grh_id')->nullable()->index();
+            $table->foreignId('employe_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
         });
     }
 
@@ -32,5 +46,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('employes');
+        Schema::dropIfExists('sessions');
     }
 };

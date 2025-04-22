@@ -37,7 +37,7 @@
                 <h1 class="text-3xl font-bold text-indigo-600">
                     <i class="fas fa-table mr-2"></i>Sample Data
                 </h1>
-                <p class="text-gray-600 ">Live data from your database tables</p>
+                <p class="text-gray-600">Live data from your database tables</p>
             </div>
             <div class="flex space-x-2">
                 <a href="/migrations-info" class="nav-pill flex items-center px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200">
@@ -47,7 +47,7 @@
         </div>
 
         <div class="space-y-8">
-            @foreach($tables as $tableName => $data)
+            @foreach(collect($tables)->sortKeys()->all() as $tableName => $data)
             <div class="data-card bg-white rounded-lg border border-gray-200 overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
                     <div class="flex justify-between items-center">
