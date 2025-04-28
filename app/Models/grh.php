@@ -2,16 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 
-class grh extends Model
+class grh extends Authenticatable implements FilamentUser
 {
-    use HasFactory, HasApiTokens;
+    use HasFactory, HasApiTokens, Notifiable;
 
     protected $fillable = [
         'name',
+        'prenom',
         'email',
         'password',
         'biometric_id',
@@ -27,10 +32,6 @@ class grh extends Model
         'password' => 'hashed',
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
     public function shift()
     {
@@ -45,5 +46,11 @@ class grh extends Model
     public function reclamationsTraitees()
     {
         return $this->hasMany(reclamations::class, 'grh_id');
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
+
     }
 }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('grhs', function (Blueprint $table) {
             $table->id();
-            $table->string('nom');
+            $table->string('name');
             $table->string('prenom');
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();

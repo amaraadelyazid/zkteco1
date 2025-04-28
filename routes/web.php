@@ -182,3 +182,6 @@ Route::get('/test-zkteco', function () {
 });
 
 
+use App\Http\Controllers\EmployeController;
+
+Route::resource('employes', EmployeController::class);

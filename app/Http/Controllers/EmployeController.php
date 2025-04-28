@@ -2,64 +2,80 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Employe;
+use App\Repositories\EmployeRepository;
 use Illuminate\Http\Request;
 
 class EmployeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $repo;
+
+    public function __construct(EmployeRepository $repo)
+    {
+        $this->repo = $repo;
+    }
+
     public function index()
     {
-        //
+        $employes = $this->repo->allPaginated();
+        return view('employes.index', compact('employes'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('employes.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'nom' => 'required|string',
+            'prenom' => 'required|string',
+            'email' => 'nullable|email|unique:employes',
+            'biometric_id' => 'required|integer|unique:employes',
+            'salaire' => 'required|numeric',
+            'poste' => 'required|string',
+            'departement_id' => 'nullable|exists:departements,id',
+            'shift_id' => 'required|exists:shifts,id',
+            'password' => 'nullable|string|min:6',
+        ]);
+
+        $this->repo->create($data);
+        return redirect()->route('employes.index')->with('success', 'Employé ajouté.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Employe $employe)
+    public function show($id)
     {
-        //
+        $employe = $this->repo->find($id);
+        return view('employes.show', compact('employe'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Employe $employe)
+    public function edit($id)
     {
-        //
+        $employe = $this->repo->find($id);
+        return view('employes.edit', compact('employe'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Employe $employe)
+    public function update(Request $request, $id)
     {
-        //
+        $data = $request->validate([
+            'nom' => 'required|string',
+            'prenom' => 'required|string',
+            'email' => 'nullable|email|unique:employes,email,' . $id,
+            'biometric_id' => 'required|integer|unique:employes,biometric_id,' . $id,
+            'salaire' => 'required|numeric',
+            'poste' => 'required|string',
+            'departement_id' => 'nullable|exists:departements,id',
+            'shift_id' => 'required|exists:shifts,id',
+            'password' => 'nullable|string|min:6',
+        ]);
+
+        $this->repo->update($id, $data);
+        return redirect()->route('employes.index')->with('success', 'Employé mis à jour.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Employe $employe)
+    public function destroy($id)
     {
-        //
+        $this->repo->delete($id);
+        return redirect()->route('employes.index')->with('success', 'Employé supprimé.');
     }
 }

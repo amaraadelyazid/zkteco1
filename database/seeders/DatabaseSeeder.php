@@ -153,7 +153,7 @@ class DatabaseSeeder extends Seeder
         $shift = DB::table('shifts')->first();
         $grhs = [
             [
-                'nom' => 'GRH',
+                'name' => 'GRH',
                 'prenom' => 'Manager',
                 'email' => 'grh@gmail.com',
                 'password' => Hash::make('password'),
@@ -178,7 +178,7 @@ class DatabaseSeeder extends Seeder
 
         $employes = [
             [
-                'nom' => 'Adel',
+                'name' => 'Adel',
                 'prenom' => 'Adel',
                 'email' => 'adel@gmail.com',
                 'password' => Hash::make('adel1234'),
@@ -193,7 +193,7 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'nom' => 'Adem',
+                'name' => 'Adem',
                 'prenom' => 'Adem',
                 'email' => 'adem@gmail.com',
                 'password' => Hash::make('adem1234'),

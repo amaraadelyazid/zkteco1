@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 
-class Employe extends Model
+class Employe extends Authenticatable implements FilamentUser
 {
-    use HasFactory, HasApiTokens;
+    use HasFactory, HasApiTokens, Notifiable;
 
     protected $fillable = [
         'name',
@@ -30,11 +34,6 @@ class Employe extends Model
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
     public function departement()
     {
@@ -64,6 +63,12 @@ class Employe extends Model
     public function ficheDePaies()
     {
         return $this->hasMany(fiche_de_paie::class);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
+
     }
 }
 

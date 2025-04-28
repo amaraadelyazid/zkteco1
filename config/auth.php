@@ -36,15 +36,15 @@ return [
     */
 
     'guards' => [
-        'web' => [
-            'driver' => 'session',
-            'provider' => 'users',
-        ],
-        'api' => [
-            'driver' => 'token',
-            'provider' => 'users',
-            'hash' => true,
-        ],
+    //    'web' => [
+    //        'driver' => 'session',
+    //        'provider' => 'users',
+    //    ],
+    //    'api' => [
+    //        'driver' => 'token',
+    //        'provider' => 'users',
+    //        'hash' => true,
+    //    ],
         'admin' => [
             'driver' => 'session',
             'provider' => 'admins',
@@ -77,10 +77,10 @@ return [
     */
 
     'providers' => [
-        'users' => [
-            'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
-        ],
+        // 'users' => [
+        //     'driver' => 'eloquent',
+        //     'model' => env('AUTH_MODEL', App\Models\User::class),
+        // ],
         'admins' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\Admin::class),
@@ -120,8 +120,26 @@ return [
     */
 
     'passwords' => [
-        'users' => [
-            'provider' => 'users',
+    //   'users' => [
+    //        'provider' => 'users',
+    //        'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+    //        'expire' => 60,
+    //        'throttle' => 60,
+    //    ],
+        'admins' => [
+            'provider' => 'admins',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'grhs' => [
+            'provider' => 'grhs',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'employes' => [
+            'provider' => 'employes',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
             'throttle' => 60,
