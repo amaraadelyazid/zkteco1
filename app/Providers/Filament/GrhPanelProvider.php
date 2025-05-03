@@ -56,6 +56,10 @@ class GrhPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+
+            ->resources([
+                \App\Filament\Resources\DepartementResource::class,
             ]);
     }
 }
