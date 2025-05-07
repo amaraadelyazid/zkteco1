@@ -1,5 +1,7 @@
 <?php
 namespace Database\Seeders;
+
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -245,60 +247,161 @@ class DatabaseSeeder extends Seeder
         ];
         DB::table('fiche_de_paies')->insert($paySlips);
     }
-
+    
     protected function seedPresences(): void
     {
+        $today = Carbon::today();
+    
+        // Récupération des employés et GRHs
         $employes = DB::table('employes')->get();
-        $devices = DB::table('dispositif_biometriques')->get();
-        $today = now()->format('Y-m-d');
-
-        foreach ($employes as $employe) {
-            $shift = DB::table('shifts')->find($employe->shift_id);
-            $startTime = now()->setTimeFromTimeString($shift->heure_debut)->subMinutes(5);
-            $endTime = now()->setTimeFromTimeString($shift->heure_fin)->addMinutes(5);
-
-            DB::table('presences')->insert([
-                'employe_id' => $employe->id,
+        $grhs = DB::table('grhs')->get();
+    
+        // Traitement des employés
+        foreach ($employes as $user) {
+            // Récupération du shift
+            $shift = DB::table('shifts')->find($user->shift_id);
+            $startTime = Carbon::today()->setTimeFromTimeString($shift->heure_debut)->subMinutes(5);
+            $endTime = Carbon::today()->setTimeFromTimeString($shift->heure_fin)->addMinutes(5);
+    
+            // Calcul correct des heures travaillées
+            $diff = $startTime->diff($endTime);
+            $heuresTravaillees = sprintf('%02d:%02d:%02d', $diff->h, $diff->i, $diff->s);
+    
+            // Insertion dans pointages_biometriques (check-in)
+            DB::table('pointages_biometriques')->insert([
+                'user_type' => 'employe',
+                'user_id' => $user->id,
                 'timestamp' => $startTime,
-                'type' => 'entrée',
-                'methode' => 'biométrique',
-                'is_anomalie' => false,
-                'etat' => 'present',
-'jour' => $today,
-'dispositif_id' => $devices->random()->id,
-'created_at' => now(),
-'updated_at' => now(),
-]);
-
-DB::table('presences')->insert([
-'employe_id' => $employe->id,
-'timestamp' => $endTime,
-'type' => 'sortie',
-'methode' => 'biométrique',
-'is_anomalie' => false,
-'etat' => 'present',
-'jour' => $today,
-'dispositif_id' => $devices->random()->id,
-'created_at' => now(),
-'updated_at' => now(),
-]);
-
-if (rand(0, 1)) {
-DB::table('presences')->insert([
-'employe_id' => $employe->id,
-'timestamp' => $startTime->addMinutes(rand(20, 60)),
-'type' => 'entrée',
-'methode' => 'manuel',
-'is_anomalie' => true,
-'etat' => 'retard',
-'jour' => $today,
-'dispositif_id' => null,
-'created_at' => now(),
-'updated_at' => now(),
-]);
-}
-}
-}
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+    
+            // Insertion dans pointages_biometriques (check-out)
+            DB::table('pointages_biometriques')->insert([
+                'user_type' => 'employe',
+                'user_id' => $user->id,
+                'timestamp' => $endTime,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+    
+            // Insertion dans presences
+            DB::table('presences')->insert([
+                'user_type' => 'employe',
+                'user_id' => $user->id,
+                'date' => $today,
+                'check_in' => $startTime,
+                'etat_check_in' => 'present',
+                'check_out' => $endTime,
+                'etat_check_out' => 'present',
+                'heures_travaillees' => $heuresTravaillees,
+                'anomalie_type' => null,
+                'anomalie_resolue' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+    
+            // Ajout aléatoire d'une anomalie (retard)
+            if (rand(0, 1)) {
+                $lateCheckIn = $startTime->copy()->addMinutes(rand(20, 60));
+                DB::table('pointages_biometriques')->insert([
+                    'user_type' => 'employe',
+                    'user_id' => $user->id,
+                    'timestamp' => $lateCheckIn,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+    
+                DB::table('presences')->insert([
+                    'user_type' => 'employe',
+                    'user_id' => $user->id,
+                    'date' => $today,
+                    'check_in' => $lateCheckIn,
+                    'etat_check_in' => 'retard',
+                    'check_out' => null,
+                    'etat_check_out' => null,
+                    'heures_travaillees' => null,
+                    'anomalie_type' => 'incomplet',
+                    'anomalie_resolue' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+    
+        // Traitement des GRHs
+        foreach ($grhs as $user) {
+            // Récupération du shift
+            $shift = DB::table('shifts')->find($user->shift_id);
+            $startTime = Carbon::today()->setTimeFromTimeString($shift->heure_debut)->subMinutes(5);
+            $endTime = Carbon::today()->setTimeFromTimeString($shift->heure_fin)->addMinutes(5);
+    
+            // Calcul correct des heures travaillées
+            $diff = $startTime->diff($endTime);
+            $heuresTravaillees = sprintf('%02d:%02d:%02d', $diff->h, $diff->i, $diff->s);
+    
+            // Insertion dans pointages_biometriques (check-in)
+            DB::table('pointages_biometriques')->insert([
+                'user_type' => 'grh',
+                'user_id' => $user->id,
+                'timestamp' => $startTime,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+    
+            // Insertion dans pointages_biometriques (check-out)
+            DB::table('pointages_biometriques')->insert([
+                'user_type' => 'grh',
+                'user_id' => $user->id,
+                'timestamp' => $endTime,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+    
+            // Insertion dans presences
+            DB::table('presences')->insert([
+                'user_type' => 'grh',
+                'user_id' => $user->id,
+                'date' => $today,
+                'check_in' => $startTime,
+                'etat_check_in' => 'present',
+                'check_out' => $endTime,
+                'etat_check_out' => 'present',
+                'heures_travaillees' => $heuresTravaillees,
+                'anomalie_type' => null,
+                'anomalie_resolue' => false,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+    
+            // Ajout aléatoire d'une anomalie (retard)
+            if (rand(0, 1)) {
+                $lateCheckIn = $startTime->copy()->addMinutes(rand(20, 60));
+                DB::table('pointages_biometriques')->insert([
+                    'user_type' => 'grh',
+                    'user_id' => $user->id,
+                    'timestamp' => $lateCheckIn,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+    
+                DB::table('presences')->insert([
+                    'user_type' => 'grh',
+                    'user_id' => $user->id,
+                    'date' => $today,
+                    'check_in' => $lateCheckIn,
+                    'etat_check_in' => 'retard',
+                    'check_out' => null,
+                    'etat_check_out' => null,
+                    'heures_travaillees' => null,
+                    'anomalie_type' => 'incomplet',
+                    'anomalie_resolue' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+    }
 
 protected function seedLeaveRequests(): void
 {
