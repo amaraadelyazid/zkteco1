@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Presence extends Model
 {
@@ -29,7 +30,7 @@ class Presence extends Model
         'anomalie_resolue' => 'boolean',
     ];
 
-    public function user()
+    public function user(): MorphTo
     {
         return $this->morphTo(__FUNCTION__, 'user_type', 'user_id');
     }
