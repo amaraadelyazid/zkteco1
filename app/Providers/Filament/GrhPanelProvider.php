@@ -17,6 +17,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Resources\FicheDePaieResource;
 
 class GrhPanelProvider extends PanelProvider
 {
@@ -32,6 +33,10 @@ class GrhPanelProvider extends PanelProvider
             ->login()
             ->colors([
                 'primary' => Color::Amber,
+            ])
+            ->resources([
+                FicheDePaieResource::class,
+                \App\Filament\Resources\DemandeCongeResource::class,
             ])
             ->discoverResources(in: app_path('Filament/Grh/Resources'), for: 'App\\Filament\\Grh\\Resources')
             ->discoverPages(in: app_path('Filament/Grh/Pages'), for: 'App\\Filament\\Grh\\Pages')

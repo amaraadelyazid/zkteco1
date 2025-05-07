@@ -17,6 +17,8 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Resources\FicheDePaieResource;
+use App\Filament\Resources\DemandeCongeResource;
 
 class EmployePanelProvider extends PanelProvider
 {
@@ -32,6 +34,10 @@ class EmployePanelProvider extends PanelProvider
             ->path('employe')
             ->colors([
                 'primary' => Color::Amber,
+            ])
+            ->resources([
+                FicheDePaieResource::class,
+                DemandeCongeResource::class,
             ])
             ->discoverResources(in: app_path('Filament/Employe/Resources'), for: 'App\\Filament\\Employe\\Resources')
             ->discoverPages(in: app_path('Filament/Employe/Pages'), for: 'App\\Filament\\Employe\\Pages')
