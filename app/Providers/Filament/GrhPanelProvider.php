@@ -37,6 +37,7 @@ class GrhPanelProvider extends PanelProvider
             ->resources([
                 FicheDePaieResource::class,
                 \App\Filament\Resources\DemandeCongeResource::class,
+                \App\Filament\Resources\ReclamationResource::class,
             ])
             ->discoverResources(in: app_path('Filament/Grh/Resources'), for: 'App\\Filament\\Grh\\Resources')
             ->discoverPages(in: app_path('Filament/Grh/Pages'), for: 'App\\Filament\\Grh\\Pages')
