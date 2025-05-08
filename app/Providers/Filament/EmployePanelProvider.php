@@ -19,6 +19,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Resources\FicheDePaieResource;
 use App\Filament\Resources\DemandeCongeResource;
+use App\Filament\Resources\ReclamationResource;
 
 class EmployePanelProvider extends PanelProvider
 {
@@ -38,6 +39,7 @@ class EmployePanelProvider extends PanelProvider
             ->resources([
                 FicheDePaieResource::class,
                 DemandeCongeResource::class,
+                ReclamationResource::class,
             ])
             ->discoverResources(in: app_path('Filament/Employe/Resources'), for: 'App\\Filament\\Employe\\Resources')
             ->discoverPages(in: app_path('Filament/Employe/Pages'), for: 'App\\Filament\\Employe\\Pages')
