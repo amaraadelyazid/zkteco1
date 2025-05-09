@@ -18,6 +18,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Resources\FicheDePaieResource;
+use App\Filament\Resources\DispositifBiometriqueResource;
 
 class GrhPanelProvider extends PanelProvider
 {
@@ -38,6 +39,7 @@ class GrhPanelProvider extends PanelProvider
                 FicheDePaieResource::class,
                 \App\Filament\Resources\DemandeCongeResource::class,
                 \App\Filament\Resources\ReclamationResource::class,
+                DispositifBiometriqueResource::class,
             ])
             ->discoverResources(in: app_path('Filament/Grh/Resources'), for: 'App\\Filament\\Grh\\Resources')
             ->discoverPages(in: app_path('Filament/Grh/Pages'), for: 'App\\Filament\\Grh\\Pages')
