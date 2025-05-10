@@ -182,7 +182,7 @@ class DispositifBiometriqueResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            
         ];
     }
 

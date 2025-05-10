@@ -27,9 +27,9 @@ class GrhPanelProvider extends PanelProvider
         return $panel
             ->id('grh')
             ->path('grh')
-            ->authGuard('grh') // Use the custom guard
-            ->authPasswordBroker('grhs') // Configure the password reset broker
-            ->passwordReset() // Enable password reset
+            ->authGuard('grh') 
+            ->authPasswordBroker('grhs') 
+            ->passwordReset() 
             ->default()
             ->login()
             ->colors([
