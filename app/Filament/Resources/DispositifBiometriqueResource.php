@@ -4,12 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DispositifBiometriqueResource\Pages;
 use App\Models\dispositif_biometrique;
+use App\Services\ZKTecoService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use MehediJaman\LaravelZkteco\LaravelZkteco;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 
@@ -20,35 +20,6 @@ class DispositifBiometriqueResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-finger-print';
 
     protected static ?string $navigationGroup = 'Configuration';
-
-    private static function testZKTecoConnection($ip, $port, $timeout = 5)
-    {
-        try {
-            // Définir le timeout pour la connexion
-            $zk = new LaravelZkteco($ip, $port);
-            $zk->setTimeout($timeout);
-            
-            $connected = $zk->connect();
-            
-            if (!$connected) {
-                throw new \Exception('Impossible de se connecter au dispositif');
-            }
-
-            $version = $zk->version();
-            $zk->disconnect();
-            
-            return [
-                'success' => true,
-                'version' => $version
-            ];
-        } catch (\Exception $e) {
-            Log::error('Erreur de connexion ZKTeco: ' . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
-        }
-    }
 
     public static function form(Form $form): Form
     {
@@ -77,13 +48,8 @@ class DispositifBiometriqueResource extends Resource
                     ->afterStateUpdated(function ($state, $record) {
                         if ($record) {
                             try {
-                                $result = self::testZKTecoConnection($record->ip, $record->port);
-                                if ($result['success']) {
-                                    $zk = new LaravelZkteco($record->ip, $record->port);
-                                    $zk->setStatus($state === 'active');
-                                    $zk->disconnect();
-                                } else {
-                                    throw new \Exception($result['message']);
+                                if (!ZKTecoService::syncStatus($record)) {
+                                    throw new \Exception('Erreur lors de la synchronisation du statut');
                                 }
                             } catch (\Exception $e) {
                                 Log::error('Erreur lors de la mise à jour du statut ZKTeco: ' . $e->getMessage());
@@ -100,7 +66,7 @@ class DispositifBiometriqueResource extends Resource
                     Forms\Components\Actions\Action::make('test_connection')
                         ->label('Tester la connexion')
                         ->action(function (dispositif_biometrique $record) {
-                            $result = self::testZKTecoConnection($record->ip, $record->port);
+                            $result = ZKTecoService::testConnection($record);
                             
                             if ($result['success']) {
                                 Notification::make()
@@ -122,40 +88,27 @@ class DispositifBiometriqueResource extends Resource
                     Forms\Components\Actions\Action::make('test_attendance')
                         ->label('Tester les pointages')
                         ->action(function (dispositif_biometrique $record) {
-                            try {
-                                $result = self::testZKTecoConnection($record->ip, $record->port);
-                                if (!$result['success']) {
-                                    throw new \Exception($result['message']);
+                            $result = ZKTecoService::getAttendance($record);
+                            
+                            if ($result['success']) {
+                                if (empty($result['data'])) {
+                                    Notification::make()
+                                        ->title('Aucun pointage trouvé')
+                                        ->warning()
+                                        ->persistent()
+                                        ->send();
+                                } else {
+                                    Notification::make()
+                                        ->title('Pointages récupérés')
+                                        ->body('Nombre de pointages: ' . count($result['data']))
+                                        ->success()
+                                        ->persistent()
+                                        ->send();
                                 }
-
-                                $zk = new LaravelZkteco($record->ip, $record->port);
-                                $zk->setTimeout(5);
-                                $connected = $zk->connect();
-                                
-                                if ($connected) {
-                                    $attendance = $zk->getAttendance();
-                                    $zk->disconnect();
-                                    
-                                    if (empty($attendance)) {
-                                        Notification::make()
-                                            ->title('Aucun pointage trouvé')
-                                            ->warning()
-                                            ->persistent()
-                                            ->send();
-                                    } else {
-                                        Notification::make()
-                                            ->title('Pointages récupérés')
-                                            ->body('Nombre de pointages: ' . count($attendance))
-                                            ->success()
-                                            ->persistent()
-                                            ->send();
-                                    }
-                                }
-                            } catch (\Exception $e) {
-                                Log::error('Erreur de récupération des pointages: ' . $e->getMessage());
+                            } else {
                                 Notification::make()
                                     ->title('Erreur de récupération des pointages')
-                                    ->body($e->getMessage())
+                                    ->body($result['message'])
                                     ->danger()
                                     ->persistent()
                                     ->send();
@@ -165,40 +118,49 @@ class DispositifBiometriqueResource extends Resource
                     Forms\Components\Actions\Action::make('test_users')
                         ->label('Tester les utilisateurs')
                         ->action(function (dispositif_biometrique $record) {
-                            try {
-                                $result = self::testZKTecoConnection($record->ip, $record->port);
-                                if (!$result['success']) {
-                                    throw new \Exception($result['message']);
+                            $result = ZKTecoService::getUsers($record);
+                            
+                            if ($result['success']) {
+                                if (empty($result['data'])) {
+                                    Notification::make()
+                                        ->title('Aucun utilisateur trouvé')
+                                        ->warning()
+                                        ->persistent()
+                                        ->send();
+                                } else {
+                                    Notification::make()
+                                        ->title('Utilisateurs récupérés')
+                                        ->body('Nombre d\'utilisateurs: ' . count($result['data']))
+                                        ->success()
+                                        ->persistent()
+                                        ->send();
                                 }
-
-                                $zk = new LaravelZkteco($record->ip, $record->port);
-                                $zk->setTimeout(5);
-                                $connected = $zk->connect();
-                                
-                                if ($connected) {
-                                    $users = $zk->getUser();
-                                    $zk->disconnect();
-                                    
-                                    if (empty($users)) {
-                                        Notification::make()
-                                            ->title('Aucun utilisateur trouvé')
-                                            ->warning()
-                                            ->persistent()
-                                            ->send();
-                                    } else {
-                                        Notification::make()
-                                            ->title('Utilisateurs récupérés')
-                                            ->body('Nombre d\'utilisateurs: ' . count($users))
-                                            ->success()
-                                            ->persistent()
-                                            ->send();
-                                    }
-                                }
-                            } catch (\Exception $e) {
-                                Log::error('Erreur de récupération des utilisateurs: ' . $e->getMessage());
+                            } else {
                                 Notification::make()
                                     ->title('Erreur de récupération des utilisateurs')
-                                    ->body($e->getMessage())
+                                    ->body($result['message'])
+                                    ->danger()
+                                    ->persistent()
+                                    ->send();
+                            }
+                        })
+                        ->visible(fn (?dispositif_biometrique $record) => $record !== null),
+                    Forms\Components\Actions\Action::make('sync_all')
+                        ->label('Synchroniser tout')
+                        ->action(function (dispositif_biometrique $record) {
+                            $result = ZKTecoService::syncDevice($record);
+                            
+                            if ($result['success']) {
+                                Notification::make()
+                                    ->title('Synchronisation réussie')
+                                    ->body($result['message'])
+                                    ->success()
+                                    ->persistent()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('Erreur de synchronisation')
+                                    ->body($result['message'])
                                     ->danger()
                                     ->persistent()
                                     ->send();
