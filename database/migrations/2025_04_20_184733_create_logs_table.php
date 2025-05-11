@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('admin_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('grh_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('employe_id')->nullable()->constrained()->nullOnDelete();
-            $table->string('level');
-            $table->string('action');
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('level')->default('info'); // info, warning, error
+            $table->string('action'); // import_users, import_attendance, sync_status, etc.
             $table->text('message');
+            $table->json('context')->nullable(); // Pour stocker des données supplémentaires
+            $table->string('device_ip')->nullable(); // IP du dispositif ZKTeco
+            $table->string('device_port')->nullable(); // Port du dispositif ZKTeco
             $table->timestamps();
         });
     }
