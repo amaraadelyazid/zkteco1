@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Actions\SyncPointagesFromZkteco;
+use Illuminate\Support\Facades\Log;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,4 +18,22 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
+    })
+    ->withSchedule(function (Illuminate\Console\Scheduling\Schedule $schedule) {
+        $schedule->call(function () {
+            try {
+                (new SyncPointagesFromZkteco)();
+                Log::info('Synchronisation ZKTeco réussie.');
+            } catch (\Exception $e) {
+                Log::error('Échec de la synchronisation ZKTeco : ' . $e->getMessage());
+            }
+        })->daily()
+          ->name('zkteco-sync')
+          ->withoutOverlapping()
+          ->onSuccess(function () {
+              Log::info('Tâche zkteco-sync exécutée avec succès.');
+          })
+          ->onFailure(function () {
+              Log::error('Tâche zkteco-sync a échoué.');
+          });
     })->create();

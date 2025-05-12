@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class PointageBiometrique extends Model
 {
+    protected $table = 'pointages_biometriques';
     use HasFactory;
 
     protected $fillable = [

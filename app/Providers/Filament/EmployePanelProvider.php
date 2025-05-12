@@ -40,6 +40,7 @@ class EmployePanelProvider extends PanelProvider
                 FicheDePaieResource::class,
                 DemandeCongeResource::class,
                 ReclamationResource::class,
+                \App\Filament\Resources\PresenceResource::class,
             ])
             ->discoverResources(in: app_path('Filament/Employe/Resources'), for: 'App\\Filament\\Employe\\Resources')
             ->discoverPages(in: app_path('Filament/Employe/Pages'), for: 'App\\Filament\\Employe\\Pages')
