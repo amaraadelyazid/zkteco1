@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('etat_check_out', ['present', 'retard', 'absent'])->nullable();
             $table->time('heures_travaillees')->nullable();
             $table->enum('anomalie_type', ['unique_pointage', 'absent', 'incomplet', 'hors_shift'])->nullable();
-            $table->boolean('anomalie_resolue')->default(false);
+            $table->boolean('anomalie_resolue')->default(true);
             $table->timestamps();
         });
     }

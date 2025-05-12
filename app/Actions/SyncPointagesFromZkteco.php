@@ -214,7 +214,7 @@ public function __invoke(): void
                         'etat_check_out' => $checkOut ? $this->determinerEtatCheckOut($checkOut, $shift) : null,
                         'heures_travaillees' => $heures,
                         'anomalie_type' => $anomalie,
-                        'anomalie_resolue' => false,
+                        'anomalie_resolue' => true,
                         'name' => $userDetails['name'] ?? null, // Add name
                         'prenom' => $userDetails['prenom'] ?? null, // Add prenom
                     ]

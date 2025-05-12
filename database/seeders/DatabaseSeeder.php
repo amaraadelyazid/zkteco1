@@ -299,7 +299,7 @@ class DatabaseSeeder extends Seeder
                 'etat_check_out' => 'present',
                 'heures_travaillees' => $heuresTravaillees,
                 'anomalie_type' => null,
-                'anomalie_resolue' => false,
+                'anomalie_resolue' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -347,7 +347,7 @@ class DatabaseSeeder extends Seeder
                 'etat_check_out' => 'present',
                 'heures_travaillees' => $heuresTravaillees,
                 'anomalie_type' => null,
-                'anomalie_resolue' => false,
+                'anomalie_resolue' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
