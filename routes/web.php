@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use App\Models\Presence;
 
 Route::get('/', function () {
     return view('welcome');
@@ -185,3 +186,23 @@ Route::get('/test-zkteco', function () {
 use App\Http\Controllers\EmployeController;
 
 Route::resource('employes', EmployeController::class);
+
+Route::get('/test-presence-user', function () {
+    // On récupère les dernières présences avec l'utilisateur lié
+    $presences = Presence::with('user')->latest()->take(10)->get();
+
+    foreach ($presences as $presence) {
+        echo "<strong>Presence ID:</strong> {$presence->id}<br>";
+        echo "<strong>User Type:</strong> {$presence->user_type}<br>";
+        echo "<strong>User ID:</strong> {$presence->user_id}<br>";
+
+        // Vérifie si un utilisateur est lié
+        if ($presence->user) {
+            echo "<strong>User Name:</strong> " . $presence->user->name ?? 'Not found' . "<br>";
+        } else {
+            echo "<strong>User:</strong> Not found<br>";
+        }
+
+        echo "<hr>";
+    }
+});

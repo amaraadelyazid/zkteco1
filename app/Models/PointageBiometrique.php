@@ -6,32 +6,27 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class Presence extends Model
+class PointageBiometrique extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_type',
         'user_id',
-        'date',
-        'check_in',
-        'etat_check_in',
-        'check_out',
-        'etat_check_out',
-        'heures_travaillees',
-        'anomalie_type',
-        'anomalie_resolue',
+        'timestamp',
     ];
 
     protected $casts = [
-        'date' => 'date',
-        'check_in' => 'datetime',
-        'check_out' => 'datetime',
-        'anomalie_resolue' => 'boolean',
+        'timestamp' => 'datetime',
     ];
 
     public function user(): MorphTo
     {
         return $this->morphTo(__FUNCTION__, 'user_type', 'user_id');
+    }
+    
+    public function dispositif()
+    {
+        return $this->belongsTo(Dispositif_biometrique::class, 'dispositif_id');
     }
 }

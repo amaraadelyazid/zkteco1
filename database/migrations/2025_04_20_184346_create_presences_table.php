@@ -6,31 +6,36 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
+        Schema::create('pointages_biometriques', function (Blueprint $table) {
+            $table->id();
+            $table->enum('user_type', ['admin', 'grh', 'employe']);
+            $table->unsignedBigInteger('user_id');
+            $table->dateTime('timestamp');
+            $table->timestamps();
+        });
+
         Schema::create('presences', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employe_id')->constrained()->onDelete('cascade');
-            $table->dateTime('timestamp');
-            $table->string('type'); // entrée, sortie
-            $table->string('methode'); // biométrique, manuel, etc.
-            $table->boolean('is_anomalie')->default(false);
-            $table->enum('etat', ['present', 'absent', 'retard']);
-            $table->date('jour');
-            $table->foreignId('dispositif_id')->nullable()->constrained('dispositif_biometriques')->nullOnDelete();
+            $table->enum('user_type', ['admin', 'grh', 'employe']);
+            $table->unsignedBigInteger('user_id');
+            $table->date('date');
+            $table->dateTime('check_in')->nullable();
+            $table->enum('etat_check_in', ['present', 'retard', 'absent'])->nullable();
+            $table->dateTime('check_out')->nullable();
+            $table->enum('etat_check_out', ['present', 'retard', 'absent'])->nullable();
+            $table->time('heures_travaillees')->nullable();
+            $table->enum('anomalie_type', ['unique_pointage', 'absent', 'incomplet', 'hors_shift'])->nullable();
+            $table->boolean('anomalie_resolue')->default(false);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('presences');
+        Schema::dropIfExists('pointages_biometriques');
     }
 };
 
