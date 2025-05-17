@@ -86,6 +86,11 @@ Route::get('/migrations-info', function () {
             'columns' => Schema::getColumnListing('logs'),
             'description' => 'System activity logs and events',
         ],
+        'pointages_biometriques' => [
+            'table' => 'pointages_biometriques',
+            'columns' => Schema::getColumnListing('pointages_biometriques'),
+            'description' => 'Biometric attendance records',
+        ],
     ];
 
     // Get foreign key relationships
@@ -141,6 +146,7 @@ Route::get('/migrations-info/sample-data', function () {
         'demande_conges' => DB::table('demande_conges')->limit(5)->get(),
         'reclamations' => DB::table('reclamations')->limit(5)->get(),
         'logs' => DB::table('logs')->limit(5)->get(),
+        'pointages_biometriques' => DB::table('pointages_biometriques')->limit(5)->get(),
     ];
 
     return view('sample-data', compact('tables'));
@@ -160,7 +166,7 @@ Route::get('/test-zkteco', function () {
 
         // Optional: Mocking connect and getTime if testing without device
         // Override or extend LaravelZkteco to mock if needed
-        if (app()->environment('local')) {
+        if (app()->environment('prod')) {
             // Simulate behavior instead of real socket calls
             return response()->json([
                 'time' => now()->toDateTimeString(),
