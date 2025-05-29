@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ZktecoUserResource\Pages;
 use App\Models\dispositif_biometrique;
+use App\Models\ZktecoUser;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,7 +15,7 @@ use Filament\Notifications\Notification;
 
 class ZktecoUserResource extends Resource
 {
-    protected static ?string $model = null;
+    protected static ?string $model = ZktecoUser::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
