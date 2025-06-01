@@ -18,6 +18,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Resources\FicheDePaieResource;
+use App\Filament\Resources\DispositifBiometriqueResource;
 
 class GrhPanelProvider extends PanelProvider
 {
@@ -26,9 +27,9 @@ class GrhPanelProvider extends PanelProvider
         return $panel
             ->id('grh')
             ->path('grh')
-            ->authGuard('grh') // Use the custom guard
-            ->authPasswordBroker('grhs') // Configure the password reset broker
-            ->passwordReset() // Enable password reset
+            ->authGuard('grh') 
+            ->authPasswordBroker('grhs') 
+            ->passwordReset() 
             ->default()
             ->login()
             ->colors([
@@ -38,6 +39,7 @@ class GrhPanelProvider extends PanelProvider
                 FicheDePaieResource::class,
                 \App\Filament\Resources\DemandeCongeResource::class,
                 \App\Filament\Resources\ReclamationResource::class,
+                DispositifBiometriqueResource::class,
                 \App\Filament\Resources\PresenceResource::class,
                 \App\Filament\Resources\PointagesResource::class,
                 \App\Filament\Resources\EmployeResource::class,
