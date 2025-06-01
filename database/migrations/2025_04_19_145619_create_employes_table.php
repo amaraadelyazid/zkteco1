@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
+            $table->string('adresse');
+            $table->string('Numero_telephone');
             $table->rememberToken();
             $table->integer('biometric_id')->unique();
             $table->float('salaire');
@@ -25,6 +27,7 @@ return new class extends Migration
             $table->foreignId('departement_id')->constrained()->onDelete('restrict')->nullable();
             $table->foreignId('shift_id')->constrained()->onDelete('restrict');
             $table->timestamps();
+            $table->boolean("is_grh")->default(false);
         });
 
         Schema::create('sessions', function (Blueprint $table) {

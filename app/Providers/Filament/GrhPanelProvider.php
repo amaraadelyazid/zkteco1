@@ -41,8 +41,14 @@ class GrhPanelProvider extends PanelProvider
                 \App\Filament\Resources\PresenceResource::class,
                 \App\Filament\Resources\PointagesResource::class,
                 \App\Filament\Resources\EmployeResource::class,
-
+                \App\Filament\Resources\FicheDePaieResource::class,
+                \App\Filament\Resources\DepartementResource::class,
+                \App\Filament\Resources\ShiftResource::class,
+                \App\Filament\Resources\AvanceResource::class,
+                \App\Filament\Resources\PrimeResource::class,
             ])
+
+
             ->discoverResources(in: app_path('Filament/Grh/Resources'), for: 'App\\Filament\\Grh\\Resources')
             ->discoverPages(in: app_path('Filament/Grh/Pages'), for: 'App\\Filament\\Grh\\Pages')
             ->pages([

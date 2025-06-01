@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\FicheDePaieResource\Pages;
+namespace App\Filament\Resources\DepartementResource\Pages;
 
-use App\Filament\Resources\FicheDePaieResource;
+use App\Filament\Resources\DepartementResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Facades\Filament;
 
-class ListFicheDePaies extends ListRecords
+class ListDepartements extends ListRecords
 {
-    protected static string $resource = FicheDePaieResource::class;
+    protected static string $resource = DepartementResource::class;
 
     protected function getHeaderActions(): array
     {

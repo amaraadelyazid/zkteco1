@@ -166,7 +166,7 @@ Route::get('/test-zkteco', function () {
 
         // Optional: Mocking connect and getTime if testing without device
         // Override or extend LaravelZkteco to mock if needed
-        if (app()->environment('prod')) {
+        if (!app()->environment('USE_DEVICE')) {
             // Simulate behavior instead of real socket calls
             return response()->json([
                 'time' => now()->toDateTimeString(),

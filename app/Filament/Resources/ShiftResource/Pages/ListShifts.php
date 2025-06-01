@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\FicheDePaieResource\Pages;
+namespace App\Filament\Resources\ShiftResource\Pages;
 
-use App\Filament\Resources\FicheDePaieResource;
+use App\Filament\Resources\ShiftResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Facades\Filament;
 
-class ListFicheDePaies extends ListRecords
+class ListShifts extends ListRecords
 {
-    protected static string $resource = FicheDePaieResource::class;
-
+    protected static string $resource = ShiftResource::class;
+    
     protected function getHeaderActions(): array
     {
         if ($panel = \Filament\Facades\Filament::getCurrentPanel()?->getId()) {

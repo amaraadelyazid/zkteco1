@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\EmployeResource\Pages;
-use App\Models\Employe;
+use App\Filament\Resources\GrhResource\Pages;
+use App\Models\Grh;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -11,17 +11,17 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Hash;
 
-class EmployeResource extends Resource
+class GrhResource extends Resource
 {
-    protected static ?string $model = Employe::class;
+    protected static ?string $model = Grh::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $navigationGroup = 'Gestion RH';
 
-    protected static ?string $label = 'Employé';
+    protected static ?string $label = 'GRH';
 
-    protected static ?string $pluralLabel = 'Employés';
+    protected static ?string $pluralLabel = 'GRHs';
 
     public static function form(Form $form): Form
     {
@@ -34,21 +34,21 @@ class EmployeResource extends Resource
                                 ->label('Nom')
                                 ->required()
                                 ->maxLength(255)
-                                ->placeholder('Ex. Dupont')
+                                ->placeholder('Ex. Martin')
                                 ->autofocus(),
 
                             Forms\Components\TextInput::make('prenom')
                                 ->label('Prénom')
                                 ->required()
                                 ->maxLength(255)
-                                ->placeholder('Ex. Jean'),
+                                ->placeholder('Ex. Sophie'),
 
                             Forms\Components\TextInput::make('email')
                                 ->label('Email')
                                 ->email()
                                 ->required()
                                 ->unique(ignoreRecord: true)
-                                ->placeholder('Ex. jean.dupont@example.com'),
+                                ->placeholder('Ex. sophie.martin@example.com'),
 
                             Forms\Components\TextInput::make('Numero_telephone')
                                 ->label('Numéro de téléphone')
@@ -63,7 +63,7 @@ class EmployeResource extends Resource
                         ->label('Adresse')
                         ->required()
                         ->maxLength(500)
-                        ->placeholder('Ex. 123 Rue Principale, 75001 Paris')
+                        ->placeholder('Ex. 456 Avenue Centrale, 75002 Paris')
                         ->rows(3),
                 ])
                 ->collapsible(),
@@ -78,7 +78,7 @@ class EmployeResource extends Resource
                                 ->required()
                                 ->unique(ignoreRecord: true)
                                 ->minValue(1)
-                                ->placeholder('Ex. 3001')
+                                ->placeholder('Ex. 2001')
                                 ->helperText('Identifiant unique pour le système biométrique.'),
 
                             Forms\Components\TextInput::make('salaire')
@@ -88,23 +88,8 @@ class EmployeResource extends Resource
                                 ->prefix('€')
                                 ->minValue(0)
                                 ->step(0.01)
-                                ->placeholder('Ex. 15.50')
-                                ->helperText('Taux horaire.'),
-
-                            Forms\Components\TextInput::make('poste')
-                                ->label('Poste')
-                                ->required()
-                                ->maxLength(255)
-                                ->placeholder('Ex. Développeur')
-                                ->helperText('Rôle ou fonction dans l\'entreprise.'),
-
-                            Forms\Components\Select::make('departement_id')
-                                ->label('Département')
-                                ->relationship('departement', 'nom')
-                                ->searchable()
-                                ->preload()
-                                ->required()
-                                ->placeholder('Sélectionnez un département'),
+                                ->placeholder('Ex. 20.00')
+                                ->helperText('Taux horaire en euros.'),
 
                             Forms\Components\Select::make('shift_id')
                                 ->label('Horaire')
@@ -132,7 +117,7 @@ class EmployeResource extends Resource
                     Forms\Components\TextInput::make('password_confirmation')
                         ->label('Confirmer le mot de passe')
                         ->password()
-                        ->required(fn (string $context, $state, $record) => $context === 'create' || filled($state))
+                        ->required(fn ($context, $state, $record) => $context === 'create' || filled($state))
                         ->dehydrated(false)
                         ->placeholder('Retapez le mot de passe')
                         ->helperText('Requis si le mot de passe est modifié.'),
@@ -162,39 +147,25 @@ class EmployeResource extends Resource
 
             Tables\Columns\TextColumn::make('biometric_id')
                 ->label('ID biométrique')
-                ->sortable(),
+                ->sortable()
+                ->searchable(),
 
             Tables\Columns\TextColumn::make('salaire')
                 ->label('Salaire horaire')
                 ->money('EUR')
                 ->sortable(),
 
-            Tables\Columns\TextColumn::make('poste')
-                ->label('Poste')
-                ->searchable()
-                ->toggleable(true),
-
-            Tables\Columns\TextColumn::make('departement.nom')
-                ->label('Département')
-                ->toggleable(),
-
             Tables\Columns\TextColumn::make('shift.nom')
                 ->label('Horaire')
                 ->toggleable(),
 
             Tables\Columns\TextColumn::make('created_at')
-                ->label('Créé')
+                ->label('Créé le')
                 ->dateTime('d/m/Y H:i')
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
         ])
         ->filters([
-            Tables\Filters\SelectFilter::make('departement_id')
-                ->label('Département')
-                ->relationship('departement', 'nom')
-                ->searchable()
-                ->preload(),
-
             Tables\Filters\SelectFilter::make('shift_id')
                 ->label('Horaire')
                 ->relationship('shift', 'nom')
@@ -221,9 +192,9 @@ class EmployeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEmployes::route('/'),
-            'create' => Pages\CreateEmploye::route('/create'),
-            'edit' => Pages\EditEmploye::route('/{record}/edit'),
+            'index' => Pages\ListGrhs::route('/'),
+            'create' => Pages\CreateGrh::route('/create'),
+            'edit' => Pages\EditGrh::route('/{record}/edit'),
         ];
     }
 }

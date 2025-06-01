@@ -5,17 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class fiche_de_paie extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'employe_id',
+        'user_type',
+        'user_id',
         'mois',
         'montant',
+        'prime',
         'avance',
         'heures_sup',
-        'primes',
+        'taux_horaire_sup',
+        'montant_heures_sup',
         'status',
         'date_generation',
     ];
@@ -24,8 +28,8 @@ class fiche_de_paie extends Model
         'date_generation' => 'datetime',
     ];
 
-    public function employe()
+    public function user()
     {
-        return $this->belongsTo(Employe::class);
+        return $this->morphTo(__FUNCTION__, 'user_type', 'user_id');
     }
 }

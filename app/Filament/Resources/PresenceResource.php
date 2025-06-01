@@ -72,7 +72,9 @@ class PresenceResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('heures_travaillees')
                     ->label('Heures travaillées')
-                    ->numeric()
+                    ->placeholder('hh:mm:ss')
+                    ->mask('99:99:99')
+                    ->helperText('Format : hh:mm:ss')
                     ->required(),
                 Forms\Components\Select::make('anomalie_type')
                     ->label('Type d\'anomalie')

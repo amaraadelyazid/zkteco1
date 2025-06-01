@@ -65,10 +65,18 @@ class Employe extends Authenticatable implements FilamentUser
         return $this->hasMany(fiche_de_paie::class);
     }
 
+    public function primes()
+    {
+        return $this->morphMany(Prime::class, 'user');
+    }
+
+    public function avances()
+    {
+        return $this->morphMany(Avance::class, 'user');
+    }
+    
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
-
     }
 }
-

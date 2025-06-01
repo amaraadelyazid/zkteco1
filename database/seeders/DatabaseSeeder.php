@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\fiche_de_paie;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
@@ -26,6 +28,8 @@ class DatabaseSeeder extends Seeder
         $this->seedLeaveRequests();
         $this->seedComplaints();
         $this->seedLogs();
+        $this->seedPrimes();
+        $this->seedAvances();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
@@ -45,6 +49,8 @@ class DatabaseSeeder extends Seeder
             'reclamations',
             'logs',
             'personal_access_tokens',
+            'primes',
+            'avances',
         ];
         foreach ($tables as $table) {
             DB::table($table)->truncate();
@@ -160,10 +166,12 @@ class DatabaseSeeder extends Seeder
                 'prenom' => 'Manager',
                 'email' => 'grh@gmail.com',
                 'password' => Hash::make('password'),
+                'adresse' => '123 Rue de la Gestion',
+                'Numero_telephone' => '0123456789',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
                 'biometric_id' => 2001,
-                'salaire' => 5000.00,
+                'salaire' => 200.00,
                 'shift_id' => $shift->id,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -185,13 +193,16 @@ class DatabaseSeeder extends Seeder
                 'prenom' => 'Adel',
                 'email' => 'adel@gmail.com',
                 'password' => Hash::make('adel1234'),
+                'adresse' => '456 Rue de l Informatique',
+                'Numero_telephone' => '0987654321',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
                 'biometric_id' => 3001,
-                'salaire' => 3000.00,
+                'salaire' => 150.00,
                 'poste' => 'Développeur',
                 'departement_id' => $departementIT->id,
                 'shift_id' => $shiftMatin->id,
+                'is_grh' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -200,13 +211,16 @@ class DatabaseSeeder extends Seeder
                 'prenom' => 'Adem',
                 'email' => 'adem@gmail.com',
                 'password' => Hash::make('adem1234'),
+                'adresse' => '789 Rue des Ressources Humaines',
+                'Numero_telephone' => '0123456789',
                 'email_verified_at' => now(),
                 'remember_token' => Str::random(10),
                 'biometric_id' => 3002,
-                'salaire' => 3500.00,
+                'salaire' => 100.00,
                 'poste' => 'Recruteur',
                 'departement_id' => $departementRH->id,
                 'shift_id' => $shiftNuit->id,
+                'is_grh' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -214,40 +228,131 @@ class DatabaseSeeder extends Seeder
         DB::table('employes')->insert($employes);
     }
 
-    protected function seedPaySlips(): void
+protected function seedPaySlips(): void
     {
+        // Fetch employees
         $adel = DB::table('employes')->where('email', 'adel@gmail.com')->first();
         $adem = DB::table('employes')->where('email', 'adem@gmail.com')->first();
-        $currentMonth = now()->format('F Y');
+        $grh = DB::table('grhs')->where('email', 'grh@gmail.com')->first();
+
+        // Validate employees
+        if (!$adel || !$adem || !$grh) {
+            Log::warning('Employees not found for seeding payslips: adel@gmail.com or adem@gmail.com or grh@gmail.com');
+            return;
+        }
+
+        $currentMonth = Carbon::now()->format('Y-m');
 
         $paySlips = [
             [
-                'employe_id' => $adel->id,
+                'user_type' => 'employe',
+                'user_id' => $adel->id,
                 'mois' => $currentMonth,
-                'montant' => $adel->salaire,
-                'avance' => 500.00,
-                'heures_sup' => 200.00,
-                'primes' => 100.00,
-                'status' => 'paid',
+                'montant' => $adel->salaire ?? 2000.00,
+                'heures_sup' => 10.00,
+                'status' => 'paye',
                 'date_generation' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'employe_id' => $adem->id,
+                'user_type' => 'employe',
+                'user_id' => $adem->id,
                 'mois' => $currentMonth,
-                'montant' => $adem->salaire,
-                'avance' => 0,
-                'heures_sup' => 150.00,
-                'primes' => 150.00,
-                'status' => 'pending',
+                'montant' => $adem->salaire ?? 2500.00,
+                'heures_sup' => 25.00,
+                'status' => 'en_attente',
+                'date_generation' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'user_type' => 'grh',
+                'user_id' => $grh->id,
+                'mois' => $currentMonth,
+                'montant' => $grh->salaire ?? 2500.00,
+                'heures_sup' => 25.00,
+                'status' => 'en_attente',
                 'date_generation' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
         ];
-        DB::table('fiche_de_paies')->insert($paySlips);
+
+        // Log data for debugging
+        Log::info('Seeding payslips', ['paySlips' => $paySlips]);
+
+        try {
+            foreach ($paySlips as $paySlip) {
+                fiche_de_paie::create($paySlip);
+            }
+            Log::info('Payslips seeded successfully');
+        } catch (\Exception $e) {
+            Log::error('Failed to seed payslips: ' . $e->getMessage(), ['paySlips' => $paySlips]);
+            throw $e;
+        }
     }
+
+    protected function seedPrimes(): void
+    {
+        $employes = DB::table('employes')->get();
+        $grhs = DB::table('grhs')->get();
+        $currentMonth = Carbon::now()->format('Y-m');
+
+        foreach ($employes as $employe) {
+            DB::table('primes')->insert([
+                'user_type' => 'employe',
+                'user_id' => $employe->id,
+                'montant' => 1000.00,
+                'description' => 'Prime de performance',
+                'mois' => $currentMonth,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        foreach ($grhs as $grh) {
+            DB::table('primes')->insert([
+                'user_type' => 'grh',
+                'user_id' => $grh->id,
+                'montant' => 1500.00,
+                'description' => 'Prime de gestion',
+                'mois' => $currentMonth,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    }
+
+    protected function seedAvances(): void
+    {
+        $employes = DB::table('employes')->get();
+        $grhs = DB::table('grhs')->get();
+        $currentMonth = Carbon::now()->format('Y-m');
+
+        foreach ($employes as $employe) {
+            DB::table('avances')->insert([
+                'user_type' => 'employe',
+                'user_id' => $employe->id,
+                'montant' => 500.00,
+                'mois' => $currentMonth,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        foreach ($grhs as $grh) {
+            DB::table('avances')->insert([
+                'user_type' => 'grh',
+                'user_id' => $grh->id,
+                'montant' => 700.00,
+                'mois' => $currentMonth,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    }
+
 
     protected function seedPresences(): void
     {
