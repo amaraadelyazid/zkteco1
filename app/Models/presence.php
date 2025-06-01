@@ -13,6 +13,8 @@ class Presence extends Model
     protected $fillable = [
         'user_type',
         'user_id',
+        'name', // Added for mass assignment
+        'prenom', // Added for mass assignment
         'date',
         'check_in',
         'etat_check_in',

@@ -13,15 +13,21 @@ return new class extends Migration
     {
         Schema::create('fiche_de_paies', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employe_id')->constrained()->onDelete('cascade');
+            $table->enum('user_type', ['grh', 'employe']);
+            $table->unsignedBigInteger('user_id');
             $table->string('mois');
             $table->float('montant');
+            $table->float('prime')->default(0);
             $table->float('avance')->default(0);
             $table->float('heures_sup')->default(0);
-            $table->float('primes')->default(0);
-            $table->string('status');
-            $table->dateTime('date_generation');
+            $table->decimal('taux_horaire_sup', 8, 2)->nullable();
+            $table->decimal('montant_heures_sup', 10, 2)->nullable();
+            $table->enum('status', ['en_attente', 'paye'])->default('en_attente');
+            $table->dateTime('date_generation')->useCurrent();;
             $table->timestamps();
+
+            $table->index(['user_type', 'user_id']);
+
         });
     }
 

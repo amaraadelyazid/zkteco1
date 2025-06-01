@@ -32,7 +32,14 @@ class grh extends Authenticatable implements FilamentUser
         'password' => 'hashed',
     ];
 
-
+    public function ficheDePaies()
+    {
+        return $this->hasMany(fiche_de_paie::class);
+    }
+    public function presences()
+    {
+        return $this->hasMany(Presence::class);
+    }
     public function shift()
     {
         return $this->belongsTo(Shift::class);
@@ -47,10 +54,19 @@ class grh extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(reclamations::class, 'grh_id');
     }
+    
+    public function primes()
+    {
+        return $this->morphMany(Prime::class, 'user');
+    }
+
+    public function avances()
+    {
+        return $this->morphMany(Avance::class, 'user');
+    }
 
     public function canAccessPanel(Panel $panel): bool
     {
         return true;
-
     }
 }
