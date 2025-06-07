@@ -70,7 +70,7 @@ class DispositifBiometriqueResource extends Resource
                                     ->send();
                             }
                         })
-                        ->visible(fn (dispositif_biometrique $record) => $record->exists),
+                        ->visible(fn (?dispositif_biometrique $record) => $record?->exists ?? false),
                     Forms\Components\Actions\Action::make('test_attendance')
                         ->label('Tester les pointages')
                         ->action(function (dispositif_biometrique $record) {
@@ -103,7 +103,7 @@ class DispositifBiometriqueResource extends Resource
                                     ->send();
                             }
                         })
-                        ->visible(fn (dispositif_biometrique $record) => $record->exists),
+                        ->visible(fn (?dispositif_biometrique $record) => $record?->exists ?? false),
                     Forms\Components\Actions\Action::make('test_users')
                         ->label('Tester les utilisateurs')
                         ->action(function (dispositif_biometrique $record) {
@@ -136,7 +136,7 @@ class DispositifBiometriqueResource extends Resource
                                     ->send();
                             }
                         })
-                        ->visible(fn (dispositif_biometrique $record) => $record->exists)
+                        ->visible(fn (?dispositif_biometrique $record) => $record?->exists ?? false)
                 ])
             ]);
     }
